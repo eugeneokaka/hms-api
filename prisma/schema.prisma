@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        String   @id @default(uuid()) // UUID for User ID
+  email     String   @unique
+  password  String
+  firstname String
+  lastname  String
+  createdAt DateTime @default(now())
+  role      Role     @default(USER)
+
+  doctor    Doctor?  // Removed @relation here
+  bookings  Booking[]
+}
+
+model Booking {
+  id       String   @id @default(uuid()) // Unique identifier
+  userId   String   // The ID of the user (patient) booking the appointment
+  date     DateTime // The date and time of the appointment (UTC format)
+
+  user     User     @relation(fields: [userId], references: [id]) // Links to the User model
+
+  @@unique([date]) // Ensures each time slot is booked only once
+}
+
+model Doctor {
+  id             String   @id @default(uuid()) // UUID for Doctor ID
+  specialization String
+  salary         Int
+
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id]) // Relation defined only here
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+  USER
+  DOCTOR
+}
+model Transaction {
+  id          String   @id @default(uuid())
+  type        TransactionType
+  amount      Decimal
+  category    String
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt]) // Index for faster queries by date
+}
+
+model Finance {
+  id         String  @id @default(uuid())
+  income     Decimal @default(0)
+  expenses   Decimal @default(0)
+  netProfit  Decimal @default(0)
+  updatedAt  DateTime @updatedAt
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+model Order {
+  id           String     @id @default(uuid())
+  orderNumber  String     @unique
+  supplier     String
+  orderDate    DateTime   @default(now())
+  recipient    String
+  price        Float
+  createdAt    DateTime   @default(now())
+
+  medicines    Medicine[]
+}
+
+model Medicine {
+  id            String     @id @default(uuid())
+  name          String
+  category      String
+  manufacturer  String
+  description   String
+  quantity      Int
+  price         Float
+  expiryDate    DateTime
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  orderId       String?
+  order         Order?     @relation(fields: [orderId], references: [id])
+  prescriptions Prescription[]
+}
+
+model Prescription {
+  id          String   @id @default(uuid())
+  patientId   String
+  doctorId    String
+  medicineId  String
+  dosage      String
+  frequency   String
+  duration    String
+  createdAt   DateTime @default(now())
+
+  medicine    Medicine @relation(fields: [medicineId], references: [id])
+}
+
