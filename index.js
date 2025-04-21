@@ -5,8 +5,15 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+
+// const { PrismaClient } = require("./generated/prisma/client");
+// const prisma = new PrismaClient();
+const { PrismaNeonHTTP } = require("@prisma/adapter-neon");
+const { PrismaClient } = require("./node_modules/@prisma/client");
+
+// 👇 Pass the URL string directly
+const adapter = new PrismaNeonHTTP(process.env.DATABASE_URL); // ✅ FIXED HERE
+const prisma = new PrismaClient({ adapter });
 // Simple route
 
 app.use(
@@ -120,6 +127,6 @@ app.post("/logout", (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 // Start the server
-app.listen(4000, () => {
-  console.log(`Server running on port 4000`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });
