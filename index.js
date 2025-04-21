@@ -19,7 +19,7 @@ const prisma = new PrismaClient({ adapter });
 app.use(
   cors({
     // origin: "http://localhost:3000", // Allow frontend origin only
-    origin: "https://hms-client-3oix.vercel.app/", // Allow frontend origin only
+    origin: "https://hms-client-3oix.vercel.app", // Allow frontend origin only
     credentials: true, // Allow cookies
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed request types
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
   // res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header(
     "Access-Control-Allow-Origin",
-    "https://hms-client-3oix.vercel.app/"
+    "https://hms-client-3oix.vercel.app"
   );
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
